@@ -9,7 +9,10 @@ import json
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 
 # -- Import and clean data (importing csv into pandas)
-df = pd.read_csv('website_table.csv')
+# -- Import and clean data (importing csv into pandas)
+df = pd.read_csv(
+    'https://raw.githubusercontent.com/annawangkkk/minesWeb/main/website_table.csv')
+# df = pd.read_csv('website_table.csv')
 area_list = df['Municipio'].unique()
 
 # ------------------------------------------------------------------------------
@@ -145,13 +148,13 @@ def update_graph(area, option_slctd, layer, chosen_label, n_clicks, chosen_clust
 
     for item in zip(labelList, colorList):
         df_1.loc[df_1['mines_outcome'] == item[0],
-               'colorBasedLabel'] = item[1]
+                 'colorBasedLabel'] = item[1]
 
     colorList_custer = ['darkgrey', 'cyan', 'orangered']
     clusterList = [2, 0, 1]
     for item in zip(clusterList, colorList_custer):
         df_1.loc[df_1['cluster'] == item[0],
-               'colorBasedCluster'] = item[1]
+                 'colorBasedCluster'] = item[1]
 
     df_sub = df_1[(df_1['mines_outcome'].isin(chosen_label))]
 
