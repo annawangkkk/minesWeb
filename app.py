@@ -9,7 +9,8 @@ import json
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 
 # -- Import and clean data (importing csv into pandas)
-df = pd.read_csv('web_mines_proba.csv')
+df = pd.read_csv('website_table.csv')
+area_list = df['Municipio'].unique()
 
 # ------------------------------------------------------------------------------
 # App layout
@@ -21,20 +22,23 @@ app.layout = dbc.Container([
     ),
 
     dbc.Row([
-        dbc.Col(html.H5("Choose the model")),
-        dbc.Col(html.H5("Choose the map layer")),
-        # dbc.Col(html.H5("Show the label"))
-    ]),
+        dbc.Col(html.H5("Choose The Model")),
+        dbc.Col(html.H5("Choose The Map Layer")),
+        dbc.Col(html.H5("Choose The Areas"))
 
+    ]),
+    # random_avg	sonson_avg	caldas_avg	test_avg
     dbc.Row([
         dbc.Col([
             dcc.Dropdown(id="model",
                          options=[
-                             {"label": "LGBM", "value": 'LGBM'},
-                             {"label": "LR", "value": 'LR'},
-                             {"label": "SVM", "value": 'SVM'}],
+                             {"label": "random", "value": 'random_avg'},
+                             {"label": "SONSON", "value": 'sonson_avg'},
+                             {"label": "CALDAS", "value": 'caldas_avg'},
+                             {"label": "test", "value": 'test_avg'}
+                         ],
                          multi=False,
-                         value='LGBM')],
+                         value='sonson_avg')],
                 ),
         dbc.Col([
             dcc.Dropdown(id="layer",
@@ -43,31 +47,63 @@ app.layout = dbc.Container([
                              {"label": "Satellite Streets", "value": 'satellite'},
                              {"label": "Outdoors", "value": 'outdoors'}],
                          multi=False,
-                         value='streets'), ],
+                         value='streets')],
+                ),
+        dbc.Col([
+            dcc.Dropdown(id="area",
+                         value=['SONSON'],
+                         placeholder="Select a region",
+                         options=[
+                             {'value': x, 'label': str(x)} for x in area_list],
+                         multi=True)]
                 ),
     ]),
     html.Hr(),
 
+    dbc.Row([
+        dbc.Col(html.H5("Choose The Label - Ground Truth Layer")),
+        dbc.Col(html.H5("Show Risk Clusters")),
+    ]),
 
-    dbc.Row(html.H5("Choose the label")),
+    dbc.Row([
 
-    dbc.Checklist(
-        id="all-or-none",
-        options=[{"label": "Select All", "value": "All"}],
-        value=["All"],
-        labelStyle={"display": "inline-block"},
-    ),
+        dbc.Col([
+            dbc.Checklist(
+                id="all-or-none",
+                options=[{"label": "Select All", "value": "All"}],
+                value=["All"],
+                labelStyle={"display": "inline-block"},
+            ),
 
-    dbc.Checklist(id="recycling_type",
-                  value=[x for x in sorted(df['mines_outcome'].unique())],
-                  options=[
-                      {'value': -1, 'label': 'Unknown'},
-                      {'value': 0, 'label': 'Negative'},
-                      {'value': 1, 'label': 'Positive'},
+            dbc.Checklist(id="recycling_type",
+                          value=[x for x in sorted(
+                              df['mines_outcome'].unique())],
+                          options=[
+                              {'value': -1, 'label': 'Unknown'},
+                              {'value': 0, 'label': 'Negative'},
+                              {'value': 1, 'label': 'Positive'},
+                          ]),
+        ]),
 
+        dbc.Col([
+            dbc.Checklist(
+                id="all-or-none-clusters",
+                options=[{"label": "Select All", "value": "All"}],
+                value=["All"],
+                labelStyle={"display": "inline-block"},
+            ),
 
-                      #  {'value': x, 'label': str(x), 'label_id': str(x)} for x in sorted(df['mines_outcome'].unique())
-                  ]),
+            dbc.Checklist(id="risk_clusters",
+                          value=[x for x in sorted(df['cluster'].unique())],
+                          options=[
+                              {'value': 2, 'label': 'Low Risk'},
+                              {'value': 0, 'label': 'Medium Risk'},
+                              {'value': 1, 'label': 'High Risk'},
+                          ]),
+
+        ])
+
+    ]),
 
 
     html.Hr(),
@@ -90,24 +126,36 @@ app.layout = dbc.Container([
 @app.callback(
     [Output(component_id='map', component_property='figure'),
      Output('no-result-alert', 'children')],
-    [Input(component_id='model', component_property='value'),
+    [Input('area', 'value'),
+     Input(component_id='model', component_property='value'),
      Input(component_id='layer', component_property='value'),
      Input('recycling_type', 'value'),
-     Input('search-address-button-tab1', 'n_clicks')],
+     Input('search-address-button-tab1', 'n_clicks'),
+     Input('risk_clusters', 'value')],
     State('address-search-tab1', 'value')
 )
-def update_graph(option_slctd, layer, chosen_label, n_clicks, address_search_1):
-
+def update_graph(area, option_slctd, layer, chosen_label, n_clicks, chosen_cluster, address_search_1):
+    print(area)
     mapbox_access_token = 'pk.eyJ1IjoicWl3YW5nYWFhIiwiYSI6ImNremtyNmxkNzR5aGwyb25mOWxocmxvOGoifQ.7ELp2wgswTdQZS_RsnW1PA'
+
+    df_1 = df[(df['Municipio'].isin(area))]
 
     colorList = ['deepskyblue', 'lime', 'red']
     labelList = [-1, 0, 1]
 
     for item in zip(labelList, colorList):
-        df.loc[df['mines_outcome'] == item[0],
+        df_1.loc[df_1['mines_outcome'] == item[0],
                'colorBasedLabel'] = item[1]
 
-    df_sub = df[(df['mines_outcome'].isin(chosen_label))]
+    colorList_custer = ['darkgrey', 'cyan', 'orangered']
+    clusterList = [2, 0, 1]
+    for item in zip(clusterList, colorList_custer):
+        df_1.loc[df_1['cluster'] == item[0],
+               'colorBasedCluster'] = item[1]
+
+    df_sub = df_1[(df_1['mines_outcome'].isin(chosen_label))]
+
+    df_sub_cluster = df_1[(df_1['cluster'].isin(chosen_cluster))]
 
     # scl = [0, "rgb(150,0,90)"], [0.125, "rgb(0, 0, 200)"], [0.25, "rgb(0, 25, 255)"],\
     #     [0.375, "rgb(0, 152, 255)"], [0.5, "rgb(44, 255, 150)"], [0.625, "rgb(151, 255, 0)"],\
@@ -117,15 +165,16 @@ def update_graph(option_slctd, layer, chosen_label, n_clicks, address_search_1):
     scl = [(0, "red"), (0.5, "yellow"), (1, "rgb(28,238,238)")]
     # Plotly Express
     locations = [go.Scattermapbox(
-        lat=df['LATITUD_Y'],
-        lon=df['LONGITUD_X'],
-        hovertext=df["{}".format(option_slctd)],
-        # text = df['Globvalue'].astype(str) + ' inches',
+        lat=df_1['LATITUD_Y'],
+        lon=df_1['LONGITUD_X'],
+        customdata=df_1["{}".format(option_slctd)],
+        hovertext=df_1["{}".format(option_slctd)],
+
+        hovertemplate='<br>Locations: (%{lat},%{lon})</br>Prediction Risk: %{customdata} <extra></extra>',
         marker=dict(
-            color=df["{}".format(option_slctd)],
+            color=df_1["{}".format(option_slctd)],
             colorscale=scl,
             reversescale=True,
-            opacity=0.7,
             size=8,
             colorbar=dict(
                 titleside="right",
@@ -136,12 +185,23 @@ def update_graph(option_slctd, layer, chosen_label, n_clicks, address_search_1):
             )
         )
     ),
+        # the layer of ground truth lable
         go.Scattermapbox(
         lat=df_sub['LATITUD_Y'],
         lon=df_sub['LONGITUD_X'],
+        hovertemplate='<br>True Label Layer</br>Locations: (%{lat},%{lon})<extra></extra>',
         marker={'size': 10, 'color': df_sub['colorBasedLabel']}
+    ),
+        # the layer of cluster
+        go.Scattermapbox(
+        lat=df_sub_cluster['LATITUD_Y'],
+        lon=df_sub_cluster['LONGITUD_X'],
+        hovertemplate='<br>Risk Cluster</br>Locations: (%{lat},%{lon})<extra></extra>',
+        marker={'size': 10, 'color': df_sub_cluster['colorBasedCluster']}
+    ),
 
-    )]
+    ]
+
     if n_clicks == 0:
         layout = go.Layout(
             uirevision='foo',  # preserves state of figure/map after callback activated
@@ -243,6 +303,8 @@ def update_graph(option_slctd, layer, chosen_label, n_clicks, address_search_1):
             'layout': layout
         }, 'Invalid Address!'
 
+# select all for labels
+
 
 @app.callback(
     Output("recycling_type", "value"),
@@ -250,6 +312,19 @@ def update_graph(option_slctd, layer, chosen_label, n_clicks, address_search_1):
     [State("recycling_type", "options")],
 )
 def select_all_none(all_selected, options):
+    all_or_none = []
+    all_or_none = [option["value"] for option in options if all_selected]
+    return all_or_none
+
+# select all for cluster
+
+
+@app.callback(
+    Output("risk_clusters", "value"),
+    [Input("all-or-none-clusters", "value")],
+    [State("risk_clusters", "options")],
+)
+def select_all_none_clusters(all_selected, options):
     all_or_none = []
     all_or_none = [option["value"] for option in options if all_selected]
     return all_or_none
