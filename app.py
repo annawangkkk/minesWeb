@@ -7,7 +7,7 @@ import requests
 import json
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
-
+app.title = 'REALminesweeper'
 # -- Import and clean data (importing csv into pandas)
 # -- Import and clean data (importing csv into pandas)
 df = pd.read_csv(
@@ -23,6 +23,20 @@ app.layout = dbc.Container([
         dbc.Col(html.H1("Landmines Risk Prediction in our different models",
                 className='text-center text-primary mb-4'), width=12)
     ),
+
+    dbc.Row(html.H5("More information about our project")),
+
+    dbc.Row(
+        html.Div([
+            html.A('Github Repository', href="http://github.com/annawangkkk/Landmine-risk-prediction.git", target="_blank",
+                   style={'color': 'blue', 'text-decoration': 'underscore'}),
+        ]),
+
+
+
+
+    ),
+    html.Hr(),
 
     dbc.Row([
         dbc.Col(html.H5("Choose The Model")),
@@ -120,7 +134,9 @@ app.layout = dbc.Container([
         html.P(id='no-result-alert')
     ]),
 
-    dbc.Row(dcc.Graph(id='map', figure={}))
+    dbc.Row(dcc.Graph(id='map', figure={})),
+
+
 
 ])
 
