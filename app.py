@@ -7,7 +7,7 @@ import requests
 import json
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
-app.title = 'REALminesweeper'
+app.title = 'RELand'
 # -- Import and clean data (importing csv into pandas)
 # -- Import and clean data (importing csv into pandas)
 df = pd.read_csv(
