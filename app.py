@@ -20,7 +20,7 @@ area_list = df['Municipio'].unique()
 app.layout = dbc.Container([
 
     dbc.Row(
-        dbc.Col(html.H1("Landmines Risk Prediction in our different models",
+        dbc.Col(html.H1("ReLand: Risk Estimator of Landmines",
                 className='text-center text-primary mb-4'), width=12)
     ),
 
