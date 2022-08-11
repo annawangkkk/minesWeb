@@ -201,11 +201,9 @@ def showAllRegions(selected, options):
 def update_graph(area, option_slctd, layer, chosen_label, n_clicks, chosen_cluster, address_search_1):
     print(option_slctd)
     mapbox_access_token = 'pk.eyJ1IjoicWl3YW5nYWFhIiwiYSI6ImNremtyNmxkNzR5aGwyb25mOWxocmxvOGoifQ.7ELp2wgswTdQZS_RsnW1PA'
-    
-    df_1_prediction = df[(df['option'].isin(option_slctd))]
-    df_1 = df[(df['Municipio'].isin(area))]
 
-        
+    df_1 = df[(df['Municipio'].isin(area))]
+    df_1_prediction = df_1[(df_1['option'].isin(option_slctd))]
 
     colorList = ['lightgrey', 'lime', 'red']
     labelList = [-1, 0, 1]
@@ -218,13 +216,13 @@ def update_graph(area, option_slctd, layer, chosen_label, n_clicks, chosen_clust
 
     colorList_custer = ['darkgrey', 'cyan', 'orangered']
     clusterList = [2, 0, 1]
-    
+
     for item in zip(clusterList, colorList_custer):
         df_1_unknow.loc[df_1_unknow['cluster'] == item[0],
                         'colorBasedCluster'] = item[1]
 
     df_sub = df_1[(df_1['mines_outcome'].isin(chosen_label))]
-    
+
     #df.loc[df['col1'] == value]
 
     df_sub_cluster = df_1_unknow[(
@@ -240,40 +238,40 @@ def update_graph(area, option_slctd, layer, chosen_label, n_clicks, chosen_clust
     locations = [
 
         go.Scattermapbox(
-        lat=df_1_prediction['LATITUD_Y'],
-        lon=df_1_prediction['LONGITUD_X'],
-        customdata=df_1['test_avg'],
-        hovertext=df_1['test_avg'],
+            lat=df_1_prediction['LATITUD_Y'],
+            lon=df_1_prediction['LONGITUD_X'],
+            customdata=df_1['test_avg'],
+            hovertext=df_1['test_avg'],
 
-        hovertemplate='<br>Locations: (%{lat},%{lon})</br>Prediction Risk: %{customdata} <extra></extra>',
-        marker=dict(
-            color=df_1['test_avg'],
-            colorscale=scl,
-            reversescale=True,
-            size=8,
-            colorbar=dict(
-                titleside="right",
-                outlinecolor="rgba(68, 68, 68, 0)",
-                ticks="outside",
-                showticksuffix="last",
-                dtick=0.1
+            hovertemplate='<br>Locations: (%{lat},%{lon})</br>Prediction Risk: %{customdata} <extra></extra>',
+            marker=dict(
+                color=df_1['test_avg'],
+                colorscale=scl,
+                reversescale=True,
+                size=8,
+                colorbar=dict(
+                    titleside="right",
+                    outlinecolor="rgba(68, 68, 68, 0)",
+                    ticks="outside",
+                    showticksuffix="last",
+                    dtick=0.1
+                )
             )
-        )
-    ),
+        ),
         # the layer of ground truth lable
         go.Scattermapbox(
-        lat=df_sub['LATITUD_Y'],
-        lon=df_sub['LONGITUD_X'],
-        hovertemplate='<br>True Label Layer</br>Locations: (%{lat},%{lon})<extra></extra>',
-        marker={'size': 10, 'color': df_sub['colorBasedLabel']}
-    ),
+            lat=df_sub['LATITUD_Y'],
+            lon=df_sub['LONGITUD_X'],
+            hovertemplate='<br>True Label Layer</br>Locations: (%{lat},%{lon})<extra></extra>',
+            marker={'size': 10, 'color': df_sub['colorBasedLabel']}
+        ),
         # the layer of cluster
         go.Scattermapbox(
-        lat=df_sub_cluster['LATITUD_Y'],
-        lon=df_sub_cluster['LONGITUD_X'],
-        hovertemplate='<br>Risk Cluster</br>Locations: (%{lat},%{lon})<extra></extra>',
-        marker={'size': 10, 'color': df_sub_cluster['colorBasedCluster']}
-    ),
+            lat=df_sub_cluster['LATITUD_Y'],
+            lon=df_sub_cluster['LONGITUD_X'],
+            hovertemplate='<br>Risk Cluster</br>Locations: (%{lat},%{lon})<extra></extra>',
+            marker={'size': 10, 'color': df_sub_cluster['colorBasedCluster']}
+        ),
 
     ]
 
