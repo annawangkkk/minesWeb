@@ -230,8 +230,7 @@ app.layout = dbc.Container([
     ]),
 
     dbc.Row(dcc.Graph(id='map', figure={})),
-
-
+    html.Br(),
 
 
 ])
