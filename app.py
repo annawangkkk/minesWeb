@@ -126,7 +126,7 @@ app.layout = dbc.Container([
         # dbc.Col(html.H5(
         #     "Danger Zones")),
     ]),
-    dbc.Row(html.P('Ground truth layer according to our dataset.'),
+    dbc.Row(html.P('The data is from Comprehensive Action Against Anti-personnel Mines of the Office of the High Commissioner for Peace of Colombia.'),
             style={'font-size': '13px'}, id='groundTruth'),
 
     dbc.Row([
