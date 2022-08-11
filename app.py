@@ -133,6 +133,44 @@ app.layout = dbc.Container([
                               {'value': 0, 'label': 'Clear Area'},
                               {'value': 1, 'label': 'Area affected by landmines'},
                           ]),
+
+
+            # dcc.Checklist(id="recycling_type", children=[
+            #     {
+            #         "label": html.Div(
+            #             [
+            #                 html.Img(src="assets/unknown.png"),
+            #                 html.Div("Area with no historical data", style={
+            #                     'font-size': 15, 'padding-left': 10}),
+            #             ], style={'display': 'flex', 'align-items': 'center', 'justify-content': 'center'}
+            #         ),
+            #         "value": -1,
+            #     },
+            #     {
+            #         "label": html.Div(
+            #             [
+            #                 html.Img(src="assets/neg.png"),
+            #                 html.Div("Clear Area", style={
+            #                     'font-size': 15, 'padding-left': 10}),
+            #             ], style={'display': 'flex', 'align-items': 'center', 'justify-content': 'center'}
+            #         ),
+            #         "value": 0,
+            #     },
+            #     {
+            #         "label": html.Div(
+            #             [
+            #                 html.Img(src="assets/pos.png"),
+            #                 html.Div("Area affected by landmines", style={
+            #                     'font-size': 15, 'padding-left': 10}),
+            #             ], style={'display': 'flex', 'align-items': 'center', 'justify-content': 'center'}
+            #         ),
+            #         "value": 1,
+            #     },
+            # ]
+            # )
+
+
+
         ]),
 
         dbc.Col([
