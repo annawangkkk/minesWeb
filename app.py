@@ -5,6 +5,7 @@ from dash import Dash, dcc, html, Input, Output, State
 import dash_bootstrap_components as dbc
 import requests
 import json
+from dash.exceptions import PreventUpdate
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 app.title = 'RELand'
@@ -20,7 +21,7 @@ area_list = df['Municipio'].unique()
 app.layout = dbc.Container([
 
     dbc.Row(
-        dbc.Col(html.H1("ReLand: Risk Estimator of Landmines",
+        dbc.Col(html.H1("RELand: Risk Estimator of Landmines",
                 className='text-center text-primary mb-4'), width=12)
     ),
 
@@ -33,30 +34,60 @@ app.layout = dbc.Container([
     #     ]),
 
 
-
-
     # ),
+
+    dbc.Row(
+
+        dbc.Checklist(
+            options=[
+                {
+                    "label": "Show the landmine risk prediction by RELand system",
+                    "value": "test_avg",
+                }, ],
+            value=['test_avg'],
+            id="model"
+        ),
+    ),
+
+    # dbc.Row(
+    #     dbc.Col(
+    #         dcc.Checklist(
+    #             [
+    #                 {
+    #                     "label": html.H5("Show the landmine risk prediction by RELand system"),
+    #                     "value": "test_avg",
+    #                 }, ],
+    #             value=['test_avg'],
+    #             id="model"
+    #         )),
+    # ),
+
+
     html.Hr(),
 
+
     dbc.Row([
-        dbc.Col(html.H5("Choose The Model")),
+        # dbc.Col(html.H5("Choose The Model")),
         dbc.Col(html.H5("Choose The Map Layer")),
         dbc.Col(html.H5("Choose The Areas"))
 
     ]),
+
+
     # random_avg	sonson_avg	caldas_avg	test_avg
     dbc.Row([
-        dbc.Col([
-            dcc.Dropdown(id="model",
-                         options=[
-                             {"label": "random", "value": 'random_avg'},
-                             {"label": "SONSON", "value": 'sonson_avg'},
-                             {"label": "CALDAS", "value": 'caldas_avg'},
-                             {"label": "test", "value": 'test_avg'}
-                         ],
-                         multi=False,
-                         value='sonson_avg')],
-                ),
+
+        # dbc.Col([
+        #     dcc.Dropdown(id="model",
+        #                  options=[
+        #                      {"label": "random", "value": 'random_avg'},
+        #                      {"label": "SONSON", "value": 'sonson_avg'},
+        #                      {"label": "CALDAS", "value": 'caldas_avg'},
+        #                      {"label": "test", "value": 'test_avg'}
+        #                  ],
+        #                  multi=False,
+        #                  value='sonson_avg')],
+        #         ),
         dbc.Col([
             dcc.Dropdown(id="layer",
                          options=[
@@ -68,18 +99,21 @@ app.layout = dbc.Container([
                 ),
         dbc.Col([
             dcc.Dropdown(id="area",
-                         value=['SONSON'],
+                         value=[x for x in area_list],
                          placeholder="Select a region",
-                         options=[
-                             {'value': x, 'label': str(x)} for x in area_list],
-                         multi=True)]
-                ),
+                         options=[{'value': x, 'label': str(x)} for x in area_list], multi=True),
+            html.Div([dcc.Checklist(id='select-all-regions',
+                                    options=[{'label': 'Show All Regions', 'value': 1}], value=[1])], id='checklist-container')
+
+        ]),
+
     ]),
     html.Hr(),
 
     dbc.Row([
-        dbc.Col(html.H5("Choose The Label - Ground Truth Layer")),
-        dbc.Col(html.H5("Show Risk Clusters")),
+        dbc.Col(html.H5("Historical Events")),
+        dbc.Col(html.H5(
+            "Clustered zones with similar levels of risk for the regions with no historical data")),
     ]),
 
     dbc.Row([
@@ -88,17 +122,16 @@ app.layout = dbc.Container([
             dbc.Checklist(
                 id="all-or-none",
                 options=[{"label": "Select All", "value": "All"}],
-                value=["All"],
+                value=[],
                 labelStyle={"display": "inline-block"},
             ),
 
             dbc.Checklist(id="recycling_type",
-                          value=[x for x in sorted(
-                              df['mines_outcome'].unique())],
+                          value=[''],
                           options=[
-                              {'value': -1, 'label': 'Unknown'},
-                              {'value': 0, 'label': 'Negative'},
-                              {'value': 1, 'label': 'Positive'},
+                              {'value': -1, 'label': 'Area with no historical data'},
+                              {'value': 0, 'label': 'Clear Area'},
+                              {'value': 1, 'label': 'Area affected by landmines'},
                           ]),
         ]),
 
@@ -106,16 +139,16 @@ app.layout = dbc.Container([
             dbc.Checklist(
                 id="all-or-none-clusters",
                 options=[{"label": "Select All", "value": "All"}],
-                value=["All"],
+                value=[],
                 labelStyle={"display": "inline-block"},
             ),
 
             dbc.Checklist(id="risk_clusters",
-                          value=[x for x in sorted(df['cluster'].unique())],
+                          value=[''],
                           options=[
-                              {'value': 2, 'label': 'Low Risk'},
-                              {'value': 0, 'label': 'Medium Risk'},
-                              {'value': 1, 'label': 'High Risk'},
+                              {'value': 2, 'label': 'Low Risk region predicted by RELand system'},
+                              {'value': 0, 'label': 'Medium Risk region predicted by RELand system'},
+                              {'value': 1, 'label': 'High Risk region predicted by RELand system'},
                           ]),
 
         ])
@@ -131,7 +164,7 @@ app.layout = dbc.Container([
         dbc.Textarea(id='address-search-tab1',
                         placeholder='Search for the street or area'),
         dbc.Button('Find', id='search-address-button-tab1', n_clicks=0),
-        html.P(id='no-result-alert')
+        # html.P(id='no-result-alert')
     ]),
 
     dbc.Row(dcc.Graph(id='map', figure={})),
@@ -141,10 +174,22 @@ app.layout = dbc.Container([
 ])
 
 
-# ------------------------------------------------------------------------------
 @app.callback(
-    [Output(component_id='map', component_property='figure'),
-     Output('no-result-alert', 'children')],
+    Output('area', 'value'),
+    [Input('select-all-regions', 'value')],
+    [State('area', 'options')])
+def showAllRegions(selected, options):
+    if len(selected) > 0:
+        return [i['value'] for i in options]
+    elif len(selected) == 0:
+        return []
+    raise PreventUpdate()
+
+# ------------------------------------------------------------------------------
+
+
+@app.callback(
+    Output(component_id='map', component_property='figure'),
     [Input('area', 'value'),
      Input(component_id='model', component_property='value'),
      Input(component_id='layer', component_property='value'),
@@ -154,13 +199,18 @@ app.layout = dbc.Container([
     State('address-search-tab1', 'value')
 )
 def update_graph(area, option_slctd, layer, chosen_label, n_clicks, chosen_cluster, address_search_1):
-    print(area)
+    print(option_slctd)
     mapbox_access_token = 'pk.eyJ1IjoicWl3YW5nYWFhIiwiYSI6ImNremtyNmxkNzR5aGwyb25mOWxocmxvOGoifQ.7ELp2wgswTdQZS_RsnW1PA'
-
+    
+    df_1_prediction = df[(df['option'].isin(option_slctd))]
     df_1 = df[(df['Municipio'].isin(area))]
 
-    colorList = ['deepskyblue', 'lime', 'red']
+        
+
+    colorList = ['lightgrey', 'lime', 'red']
     labelList = [-1, 0, 1]
+    # -1: unknown; 0:negative; 1:positive
+    df_1_unknow = df_1.loc[df_1['mines_outcome'] == -1]
 
     for item in zip(labelList, colorList):
         df_1.loc[df_1['mines_outcome'] == item[0],
@@ -168,13 +218,17 @@ def update_graph(area, option_slctd, layer, chosen_label, n_clicks, chosen_clust
 
     colorList_custer = ['darkgrey', 'cyan', 'orangered']
     clusterList = [2, 0, 1]
+    
     for item in zip(clusterList, colorList_custer):
-        df_1.loc[df_1['cluster'] == item[0],
-                 'colorBasedCluster'] = item[1]
+        df_1_unknow.loc[df_1_unknow['cluster'] == item[0],
+                        'colorBasedCluster'] = item[1]
 
     df_sub = df_1[(df_1['mines_outcome'].isin(chosen_label))]
+    
+    #df.loc[df['col1'] == value]
 
-    df_sub_cluster = df_1[(df_1['cluster'].isin(chosen_cluster))]
+    df_sub_cluster = df_1_unknow[(
+        df_1_unknow['cluster'].isin(chosen_cluster))]
 
     # scl = [0, "rgb(150,0,90)"], [0.125, "rgb(0, 0, 200)"], [0.25, "rgb(0, 25, 255)"],\
     #     [0.375, "rgb(0, 152, 255)"], [0.5, "rgb(44, 255, 150)"], [0.625, "rgb(151, 255, 0)"],\
@@ -183,15 +237,17 @@ def update_graph(area, option_slctd, layer, chosen_label, n_clicks, chosen_clust
 
     scl = [(0, "red"), (0.5, "yellow"), (1, "rgb(28,238,238)")]
     # Plotly Express
-    locations = [go.Scattermapbox(
-        lat=df_1['LATITUD_Y'],
-        lon=df_1['LONGITUD_X'],
-        customdata=df_1["{}".format(option_slctd)],
-        hovertext=df_1["{}".format(option_slctd)],
+    locations = [
+
+        go.Scattermapbox(
+        lat=df_1_prediction['LATITUD_Y'],
+        lon=df_1_prediction['LONGITUD_X'],
+        customdata=df_1['test_avg'],
+        hovertext=df_1['test_avg'],
 
         hovertemplate='<br>Locations: (%{lat},%{lon})</br>Prediction Risk: %{customdata} <extra></extra>',
         marker=dict(
-            color=df_1["{}".format(option_slctd)],
+            color=df_1['test_avg'],
             colorscale=scl,
             reversescale=True,
             size=8,
@@ -247,7 +303,7 @@ def update_graph(area, option_slctd, layer, chosen_label, n_clicks, chosen_clust
         return{
             'data': locations,
             'layout': layout
-        }, None
+        }
 
     else:
         # Geocode the lat-lng using Google Maps API
@@ -292,7 +348,7 @@ def update_graph(area, option_slctd, layer, chosen_label, n_clicks, chosen_clust
             return {
                 'data': locations,
                 'layout': layout
-            }, None
+            }
 
         else:
             layout = go.Layout(
@@ -320,7 +376,7 @@ def update_graph(area, option_slctd, layer, chosen_label, n_clicks, chosen_clust
         return{
             'data': locations,
             'layout': layout
-        }, 'Invalid Address!'
+        }
 
 # select all for labels
 

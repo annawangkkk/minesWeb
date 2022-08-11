@@ -20,6 +20,11 @@
     text-align: center;
 }
 
-#recycling_type,#risk_clusters {
+#recycling_type,
+#risk_clusters {
     margin-left: 30px;
+}
+
+#model {
+    font-size: 25px;
 }
