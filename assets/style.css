@@ -28,3 +28,25 @@
 #model {
     font-size: 25px;
 }
+
+#unknown {
+    color: gray;
+    font-weight: bold;
+}
+
+#negative,
+#low {
+    color: green;
+    font-weight: bold;
+}
+
+#positive,
+#high {
+    color: red;
+    font-weight: bold;
+}
+
+#medium {
+    color: rgb(98, 159, 159);
+    font-weight: bold;
+}

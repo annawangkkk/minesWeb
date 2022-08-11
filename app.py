@@ -129,10 +129,16 @@ app.layout = dbc.Container([
             dbc.Checklist(id="recycling_type",
                           value=[''],
                           options=[
-                              {'value': -1, 'label': 'Area with no historical data'},
-                              {'value': 0, 'label': 'Clear Area'},
-                              {'value': 1, 'label': 'Area affected by landmines'},
-                          ]),
+                              {'value': -1, 'label': 'Area with no historical data',
+                                  'label_id': 'unknown'},
+                              {'value': 0, 'label': 'Clear Area',
+                                  'label_id': 'negative'},
+                              {'value': 1, 'label': 'Area affected by landmines',
+                                  'label_id': 'positive'},
+                          ],
+
+
+                          ),
 
 
             # dcc.Checklist(id="recycling_type", children=[
@@ -184,9 +190,12 @@ app.layout = dbc.Container([
             dbc.Checklist(id="risk_clusters",
                           value=[''],
                           options=[
-                              {'value': 2, 'label': 'Low Risk region predicted by RELand system'},
-                              {'value': 0, 'label': 'Medium Risk region predicted by RELand system'},
-                              {'value': 1, 'label': 'High Risk region predicted by RELand system'},
+                              {'value': 2, 'label': 'Low Risk region predicted by RELand system',
+                                  'label_id': 'low'},
+                              {'value': 0, 'label': 'Medium Risk region predicted by RELand system',
+                                  'label_id': 'medium'},
+                              {'value': 1, 'label': 'High Risk region predicted by RELand system',
+                                  'label_id': 'high'},
                           ]),
 
         ])
@@ -252,7 +261,7 @@ def update_graph(area, option_slctd, layer, chosen_label, n_clicks, chosen_clust
         df_1.loc[df_1['mines_outcome'] == item[0],
                  'colorBasedLabel'] = item[1]
 
-    colorList_custer = ['darkgrey', 'cyan', 'orangered']
+    colorList_custer = ['lime', 'cyan', 'orangered']
     clusterList = [2, 0, 1]
 
     for item in zip(clusterList, colorList_custer):
