@@ -36,20 +36,6 @@ app.layout = dbc.Container([
 
     # ),
 
-    dbc.Row(
-
-        dbc.Checklist(
-            options=[
-                {
-                    "label": "Show the landmine risk prediction by RELand system",
-                    "value": "test_avg",
-                }, ],
-            value=['test_avg'],
-            id="model"
-        ),
-    ),
-    dbc.Row(html.P('Disclaimer: The information presented here should be taken only as an estimate resulting from academic research and should be analyzed with other expert knowledge to determine the actual risk of landmines in the studied area in a human-in-the-loop approach.'),
-            style={'font-size': '13px'}),
 
     # dbc.Row(
     #     dbc.Col(
@@ -66,6 +52,7 @@ app.layout = dbc.Container([
 
 
     html.Hr(),
+
 
 
     dbc.Row([
@@ -111,12 +98,36 @@ app.layout = dbc.Container([
 
     ]),
     html.Hr(),
+    dbc.Row([
+        dbc.Col(html.H5("Risk Prediction"))
+    ]),
+
+    dbc.Row(
+
+        dbc.Checklist(
+            options=[
+                {
+                    "label": "Show the landmine risk prediction by RELand system",
+                    "value": "test_avg",
+                    "label_id": "showPrediction"
+                }, ],
+            value=['test_avg'],
+            id="model"
+        ),
+    ),
+    dbc.Row(html.P('Disclaimer: The information presented here should be taken only as an estimate resulting from academic research and should be analyzed with other expert knowledge to determine the actual risk of landmines in the studied area in a human-in-the-loop approach.'),
+            style={'font-size': '13px'}),
+    html.Hr(),
+
+
 
     dbc.Row([
         dbc.Col(html.H5("Historical Events")),
-        dbc.Col(html.H5(
-            "Clustered zones with similar levels of risk for the regions with no historical data")),
+        # dbc.Col(html.H5(
+        #     "Danger Zones")),
     ]),
+    dbc.Row(html.P('Ground truth layer according to our dataset.'),
+            style={'font-size': '13px'}, id='groundTruth'),
 
     dbc.Row([
 
@@ -142,44 +153,44 @@ app.layout = dbc.Container([
 
                           ),
 
-
-            # dcc.Checklist(id="recycling_type", children=[
-            #     {
-            #         "label": html.Div(
-            #             [
-            #                 html.Img(src="assets/unknown.png"),
-            #                 html.Div("Area with no historical data", style={
-            #                     'font-size': 15, 'padding-left': 10}),
-            #             ], style={'display': 'flex', 'align-items': 'center', 'justify-content': 'center'}
-            #         ),
-            #         "value": -1,
-            #     },
-            #     {
-            #         "label": html.Div(
-            #             [
-            #                 html.Img(src="assets/neg.png"),
-            #                 html.Div("Clear Area", style={
-            #                     'font-size': 15, 'padding-left': 10}),
-            #             ], style={'display': 'flex', 'align-items': 'center', 'justify-content': 'center'}
-            #         ),
-            #         "value": 0,
-            #     },
-            #     {
-            #         "label": html.Div(
-            #             [
-            #                 html.Img(src="assets/pos.png"),
-            #                 html.Div("Area affected by landmines", style={
-            #                     'font-size': 15, 'padding-left': 10}),
-            #             ], style={'display': 'flex', 'align-items': 'center', 'justify-content': 'center'}
-            #         ),
-            #         "value": 1,
-            #     },
-            # ]
-            # )
-
-
-
         ]),
+
+
+
+        # dbc.Col([
+        #     dbc.Checklist(
+        #         id="all-or-none-clusters",
+        #         options=[{"label": "Select All", "value": "All"}],
+        #         value=[],
+        #         labelStyle={"display": "inline-block"},
+        #     ),
+
+        #     dbc.Checklist(id="risk_clusters",
+        #                   value=[''],
+        #                   options=[
+        #                       {'value': 2, 'label': 'Low Risk region predicted by RELand system',
+        #                           'label_id': 'low'},
+        #                       {'value': 0, 'label': 'Medium Risk region predicted by RELand system',
+        #                           'label_id': 'medium'},
+        #                       {'value': 1, 'label': 'High Risk region predicted by RELand system',
+        #                           'label_id': 'high'},
+        #                   ]),
+
+        # ])
+
+    ]),
+
+
+    html.Hr(),
+
+    dbc.Row([
+        dbc.Col(html.H5("Danger Zones")),
+    ]),
+    dbc.Row(html.P('Clustered zones with similar levels of risk for the regions with no historical data.'),
+            style={'font-size': '13px'}),
+
+
+    dbc.Row([
 
         dbc.Col([
             dbc.Checklist(
@@ -205,8 +216,10 @@ app.layout = dbc.Container([
     ]),
 
 
-    html.Hr(),
 
+
+
+    html.Hr(),
 
     # search bar for searching address
     dbc.Row([
