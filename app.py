@@ -48,6 +48,8 @@ app.layout = dbc.Container([
             id="model"
         ),
     ),
+    dbc.Row(html.P('Disclaimer: The information presented here should be taken only as an estimate resulting from academic research and should be analyzed with other expert knowledge to determine the actual risk of landmines in the studied area in a human-in-the-loop approach.'),
+            style={'font-size': '13px'}),
 
     # dbc.Row(
     #     dbc.Col(
@@ -129,11 +131,11 @@ app.layout = dbc.Container([
             dbc.Checklist(id="recycling_type",
                           value=[''],
                           options=[
-                              {'value': -1, 'label': 'Area with no historical data',
+                              {'value': -1, 'label': 'Areas with no historical data',
                                   'label_id': 'unknown'},
-                              {'value': 0, 'label': 'Clear Area',
+                              {'value': 0, 'label': 'Areas declared mine-free',
                                   'label_id': 'negative'},
-                              {'value': 1, 'label': 'Area affected by landmines',
+                              {'value': 1, 'label': 'Areas affected by landmines',
                                   'label_id': 'positive'},
                           ],
 
@@ -215,6 +217,7 @@ app.layout = dbc.Container([
     ]),
 
     dbc.Row(dcc.Graph(id='map', figure={})),
+
 
 
 
