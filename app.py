@@ -276,7 +276,7 @@ def update_graph(area, option_slctd, layer, chosen_label, n_clicks, chosen_clust
         df_1.loc[df_1['mines_outcome'] == item[0],
                  'colorBasedLabel'] = item[1]
 
-    colorList_custer = ['lime', 'cyan', 'orangered']
+    colorList_custer = ['cyan', 'rgb(245, 221, 43)', 'orangered']
     clusterList = [2, 0, 1]
 
     for item in zip(clusterList, colorList_custer):
