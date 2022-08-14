@@ -25,35 +25,7 @@ app.layout = dbc.Container([
                 className='text-center text-primary mb-4'), width=12)
     ),
 
-    # dbc.Row(html.H5("More information about our project")),
-
-    # dbc.Row(
-    #     html.Div([
-    #         html.A('Github Repository', href="http://github.com/annawangkkk/Landmine-risk-prediction.git", target="_blank",
-    #                style={'color': 'blue', 'text-decoration': 'underscore'}),
-    #     ]),
-
-
-    # ),
-
-
-    # dbc.Row(
-    #     dbc.Col(
-    #         dcc.Checklist(
-    #             [
-    #                 {
-    #                     "label": html.H5("Show the landmine risk prediction by RELand system"),
-    #                     "value": "test_avg",
-    #                 }, ],
-    #             value=['test_avg'],
-    #             id="model"
-    #         )),
-    # ),
-
-
     html.Hr(),
-
-
 
     dbc.Row([
         # dbc.Col(html.H5("Choose The Model")),
@@ -63,20 +35,9 @@ app.layout = dbc.Container([
     ]),
 
 
-    # random_avg	sonson_avg	caldas_avg	test_avg
+    # sonson_avg
     dbc.Row([
 
-        # dbc.Col([
-        #     dcc.Dropdown(id="model",
-        #                  options=[
-        #                      {"label": "random", "value": 'random_avg'},
-        #                      {"label": "SONSON", "value": 'sonson_avg'},
-        #                      {"label": "CALDAS", "value": 'caldas_avg'},
-        #                      {"label": "test", "value": 'test_avg'}
-        #                  ],
-        #                  multi=False,
-        #                  value='sonson_avg')],
-        #         ),
         dbc.Col([
             dcc.Dropdown(id="layer",
                          options=[
@@ -157,27 +118,6 @@ app.layout = dbc.Container([
 
 
 
-        # dbc.Col([
-        #     dbc.Checklist(
-        #         id="all-or-none-clusters",
-        #         options=[{"label": "Select All", "value": "All"}],
-        #         value=[],
-        #         labelStyle={"display": "inline-block"},
-        #     ),
-
-        #     dbc.Checklist(id="risk_clusters",
-        #                   value=[''],
-        #                   options=[
-        #                       {'value': 2, 'label': 'Low Risk region predicted by RELand system',
-        #                           'label_id': 'low'},
-        #                       {'value': 0, 'label': 'Medium Risk region predicted by RELand system',
-        #                           'label_id': 'medium'},
-        #                       {'value': 1, 'label': 'High Risk region predicted by RELand system',
-        #                           'label_id': 'high'},
-        #                   ]),
-
-        # ])
-
     ]),
 
 
@@ -214,7 +154,6 @@ app.layout = dbc.Container([
         ])
 
     ]),
-
 
 
 
@@ -302,12 +241,12 @@ def update_graph(area, option_slctd, layer, chosen_label, n_clicks, chosen_clust
         go.Scattermapbox(
             lat=df_1_prediction['LATITUD_Y'],
             lon=df_1_prediction['LONGITUD_X'],
-            customdata=df_1['test_avg'],
-            hovertext=df_1['test_avg'],
+            customdata=df_1['sonson_avg'],
+            hovertext=df_1['sonson_avg'],
 
             hovertemplate='<br>Locations: (%{lat},%{lon})</br>Prediction Risk: %{customdata} <extra></extra>',
             marker=dict(
-                color=df_1['test_avg'],
+                color=df_1['sonson_avg'],
                 colorscale=scl,
                 reversescale=True,
                 size=8,
