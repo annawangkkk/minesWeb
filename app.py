@@ -108,10 +108,10 @@ app.layout = dbc.Container([
             options=[
                 {
                     "label": "Show the landmine risk prediction by RELand system",
-                    "value": "test_avg",
+                    "value": "sonson_avg",
                     "label_id": "showPrediction"
                 }, ],
-            value=['test_avg'],
+            value=['sonson_avg'],
             id="model"
         ),
     ),
