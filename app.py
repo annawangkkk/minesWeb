@@ -29,7 +29,7 @@ app.layout = dbc.Container([
 
     dbc.Row([
         # dbc.Col(html.H5("Choose The Model")),
-        dbc.Col(html.H5("Choose The Map Layer")),
+        dbc.Col(html.H5("Choose The Map Style")),
         dbc.Col(html.H5("Choose The Areas"))
 
     ]),
